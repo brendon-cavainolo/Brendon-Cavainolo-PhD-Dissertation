@@ -13,6 +13,7 @@
 \usepackage{subcaption}
 \usepackage{rotating}
 \usepackage{tabularx}
+\usepackage{pdflscape}
 \usepackage[square,numbers]{natbib}
 %\bibliographystyle{new-aiaa}
 \bibliographystyle{abbrvnat}
@@ -1624,12 +1625,14 @@ This section will outline the preliminary results from each method described in 
     \label{fig:point_probes}
 \end{figure}
 
-\begin{sidewaysfigure}
-    \centering
-    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{Figures/pressures_Mach_sweep.png}
-    \caption{Normalized pressure measured at probe points throughout the droplet center axis.}
-    \label{fig:pressure_mach_sweep}
-\end{sidewaysfigure}
+\begin{landscape}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{Figures/pressures_Mach_sweep.png}
+        \caption{Normalized pressure measured at probe points throughout the droplet center axis.}
+        \label{fig:pressure_mach_sweep}
+    \end{figure}
+\end{landscape}
 
 \subsection{Secondary Droplets}
 \label{subsec:secondaryDropResults}
