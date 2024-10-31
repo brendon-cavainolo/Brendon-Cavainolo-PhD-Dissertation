@@ -92,7 +92,7 @@ The Volume-of-Fluid method, an Eulerian multiphase flow model that adds a volume
 
 \newpage
 
-\section{LIST OF ABBREVIATIONS}
+\chapter{LIST OF ABBREVIATIONS}
 \begin{acronym}
     \acro{CMAS}{Calcium-Magnesium-Alumino-Silicate}
     \acro{CFD}{Computational Fluid Dynamics}
@@ -291,7 +291,7 @@ The incompressible regime, where $Ma < 0.3$, is the regime in which the density 
 or equivalently, the material derivative of the density must be zero \cite{johnson2016handbook}.
 Beyond the incompressible regime, special care must be taken to handle the fact that density changes with respect to temperature and pressure. An equation of state must be introduced \cite{GasDynamics}, which, in CFD simulations, acts as a nonlinear step in the solver \cite{Anderson1995}. Popular equations of state for gases and liquids will now be summarized.
 
-\subsubsection{Equations of State}
+\subsection{Equations of State}
 
 As mentioned earlier, equations of state (EOS) describe how a material's properties change with respect to other propertioes.
 
@@ -1375,44 +1375,53 @@ Surface Tension (N/m)& 0.4 \cite{Bravo2020}& -\\
 One important departure from previous work, however, is the use of the melting-solidification flow stop model to achieve a more accurate infiltration time. Here, a linear solidification curve is defined between the liquidus and solidus temperatures (1503 K and 1523 K respectively). The solid fraction of a particular cell is calculated as described in Section \ref{sec:solidmodel}.
 
 
-\subsection{New Method: Feathery Pipe Network}
+\subsection{Theoretical Model: FPNM}
 \label{sec:pipeNetworkMethod}
-This works also seeks a more representative, but still intuitive way of describing the flow in a feathery TBC. Another way of looking at a feathery TBC is a network of capillary channels, one going primarily downward, and many secondary channels extending (almost) horizontally from the primary tube. These secondary channels, in theory, cause the flow in the primary channel to slow down. To do this, the following variables are defined:
+This works also seeks a more representative, but still intuitive way of describing the flow within the feathery microstructure of a TBC. Therefore, a feathery-pipe-network model (FPNM)  is formulated and proposed and is based on considering a network of capillary channels. This model was inspired by a capillary flow electrical circuit analogy \cite{Mikaelian2020}. However, the circuit analogy does not allow for configurations matching the TBC gap. So, FPNM is proposed. Theoretical model development has also shown that the Lucas-Washburn equation can indeed be extended into larger, heterogeneous porous media \cite{Cai2021, WAGHMARE2010561}, but this theoretical model is also more generalized and is difficult to specifically model the configurations seen in Figures \ref{fig:TBC_scans} and \ref{fig:dimensions}.
+In FPNM, there is a primary channel, with other secondary channels extending (almost) perpendicular from the primary tube. In the context of the FPNM, these secondary channels, effectively retard the primary-channel flow. The FPNM model formulation demands added input using the following variables (which can be referenced in Fig. \ref{fig:FPNM_cartoon}:
 
 \begin{itemize}
-    \item n, the number of secondary channels affecting the flow in the primary channel (increases as depth of CMAS in primary tube increases)
+    \item $n$, the number of secondary channels affecting the flow in the primary channel (increases as depth of CMAS in primary tube increases)
     \item $h_{p}$, the depth of the CMAS in the primary channel
     \item $h_{s}$, the depth of the CMAS in a secondary channel
-    \item $B$ is the intercolumnar gap (width of the primary channel)
+    \item $B$ is the inter-columnar gap (width of the primary channel)
     \item $b$ is the feather gap width
     \item $\Delta b$ is the separation between each feather gap
+    \item $\theta$ is the feather angle
     \item $L_{s}$ and $L_{p}$ are the lengths of the primary channel (the coating depth), and the feather length respectively
 \end{itemize}
 
-\noindent Now, examining the Washburn problem \cite{Washburn19213}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/FPNM_cartoon.png}
+    \caption{Visual representation of geometric parameters describing FPNM}
+    \label{fig:FPNM_cartoon}
+\end{figure}
+
+\noindent A visual representation of these variables is shown in Fig.~\ref{fig:FPNM_cartoon}. It is proposed to adapt these variables into the Washburn model\cite{Washburn19213}, which is given as
 
 \begin{equation}
-    \frac{dh}{dt} = \frac{d^{2}}{\mu}\frac{\Delta P}{L}
+    \frac{dh}{dt} = \frac{d^{2}}{\mu}\frac{\Delta P}{L}.
 \end{equation}
 
-\noindent where $\Delta P = \sigma/d$, this is the proposed relation for the primary channel, as so
+\noindent Where $\Delta P = \sigma/d$, this is the proposed relation for the primary channel, as so
 
 \begin{equation}
     \frac{dh_{p}}{dt} = \frac{B^{2}}{\mu}\frac{\Delta P}{L_{p}}.
 \end{equation}
 
-\noindent However, an additional term to account for the flow in the secondary channels must be added (i.e. the flow that is causing 'resistance' in the primary channel). If we assume that this resistance takes the form
+\noindent However, an additional term to account for the flow in the secondary channels must be added (i.e. the flow that is causing ``resistance'' in the primary channel). If we assume that this resistance, $R_{s}$, takes the form
 
 \begin{equation}
-    R_{secondary} = \frac{b^{2}}{\mu}\frac{\Delta P}{L_{s}},
+    R_{s} = \frac{b^{2}}{\mu}\frac{\Delta P}{L_{s}}cos\theta,
 \end{equation}
 
 \noindent it can be said that 
 \begin{equation}
-        \frac{dh_{p}}{dt} = \frac{B^{2}}{\mu}\frac{\Delta P}{L_{p}} -n\frac{b^{2}}{\mu}\frac{\Delta P}{L_{s}}.
+        \frac{dh_{p}}{dt} = \frac{B^{2}}{\mu}\frac{\Delta P}{L_{p}} -ncos\theta\frac{b^{2}}{\mu}\frac{\Delta P}{L_{s}}.
 \end{equation}
 
-\noindent Increasing $n$ as the infiltration of the primary channel increases must be accounted for as well. This can be done with
+\noindent The number of feathers affecting the flow in the primary channel ($n$) increases as the depth of CMAS in the primary channel increases. However, $n$ can be solved directly since the primary channel height ($h_p$), feather width ($b$), and feather gap width ($\Delta b$) are known.
 
 \begin{equation}
     n = 2\frac{h_{p}}{b + \Delta b}.
@@ -1421,7 +1430,7 @@ This works also seeks a more representative, but still intuitive way of describi
 \noindent So the overall equation becomes, after substituting $\Delta P = \sigma/d$,
 
 \begin{equation}
-    \frac{dh_{p}}{dt} = \frac{B \sigma}{h_{p}\mu} - 2\left(\frac{h_{p}}{b + \Delta b} \right)\frac{b \sigma}{L_{s}\mu}.
+    \frac{dh_{p}}{dt} = \frac{B \sigma}{h_{p}\mu} - 2 cos\theta\left(\frac{h_{p}}{b + \Delta b} \right)\frac{b \sigma}{L_{s}\mu}.
 \end{equation}
 
 
@@ -1433,16 +1442,22 @@ This works also seeks a more representative, but still intuitive way of describi
 \noindent Implementing this definition and rearranging yields a time-dependent differential equation
 
 \begin{equation}
-    \frac{dh_{p}}{dt} = \frac{\sigma B}{\mu} \frac{1}{h_{p}(t)} - 2h_{p}(t) \left( \frac{1}{b+\Delta b} \right) \sqrt{\frac{\sigma b}{\mu t}}
+    \frac{dh_{p}}{dt} = \frac{\sigma B}{\mu} \frac{1}{h_{p}(t)} - 2 cos\theta h_{p}(t) \left( \frac{1}{b+\Delta b} \right) \sqrt{\frac{\sigma b}{\mu t}}
+    \label{eq:FPNM_dimensional}
 \end{equation}
 
-\noindent which can be rearranged and rewritten in terms of the Ohnesorge numbers with respect to the primary channel and the secondary channel
+\noindent which can be rearranged and rewritten in terms of the $Oh$ with respect to the primary channel, as well as non-dimensional variables $h_p^* = h_p/B$, and $t^* = t/t_{B}$, where $t_{B} = \sqrt{\frac{\rho B^{3}}{\sigma}}$
+\begin{eqnarray}
+\label{eq:FPNM_non-dimensional}
+    &&h_{p}^{*}\left(t^{*}\right)\frac{dh_{p}^{*}}{dt^{*}} + 2 cos\theta \sqrt{\frac{\rho B^{3}}{\sigma}} \left( \frac{1}{b+\Delta b} \right)\left(h_{p}^{*}\left(t^{*}\right)\right)^{2} \\
+    && + \sqrt{\frac{\sigma b}{\mu B^{2}}} \frac{1}{\sqrt{t^{*}}} h_{p}^{*} \left(t^{*}\right) = Oh_{B}^{-1}. \nonumber
+\end{eqnarray}
+% \begin{equation}
 
-\begin{equation}
-    h_{p}\left(t\right)\frac{dh_{p}}{dt} + 2\left(h_{p}\left(t\right)\right)^{2} \left( \frac{1}{b+\Delta b} \right) \frac{1}{\sqrt{t}}\frac{Oh_{b}}{\sqrt{\nu}} = \frac{Oh_{B}^{2}}{\nu} .
-\end{equation}
+% \end{equation}
 
-\noindent This is a nonlinear first-order ODE that is readily solvable. Note that this ODE is solved incrementally in order to account for the non-linear viscosity.
+
+\noindent Here, we have a nonlinear, first-order ODE that is readily solvable. To account for non-linear variations of fluid properties, such as viscosity, Eq.~\ref{eq:FPNM_non-dimensional} is solved in small time increments, and the properties are updated after each increment. Importantly, the maximum viscosity is limited to the viscosity the CMAS achieves at its solidification temperature. Viscosity does not change above this point in FPNM.
 
 \chapter{RESULTS AND DISCUSSION}
 \section{Shock-droplet Interactions}
@@ -1455,7 +1470,7 @@ This section will outline the preliminary results from each method described in 
 
 
 
-\subsection{Driving Forces of Droplet Breakup}
+\subsection{Driving Forces of Droplet Deformation and Breakup}
 
 - Now, we examine how the passive scalars described for force accumulation (Equations~\ref{eq:pressureIntegrated} and ~\ref{eq:shearIntegrated}) behave.
 - The goal is to understand the fundamental driving forces of droplet breakup, and to identify forces in regions of interest (such as regions likely to cavitate.)
@@ -1463,28 +1478,74 @@ This section will outline the preliminary results from each method described in 
 - Now, we highlight information that can be inferred from Figure~\ref{fig:shear_pressure_accumulation}.\\
 
 - The accumulated shear stress in Figure~\ref{fig:shear_pressure_accumulation} is distributed along the air-water interface.
-- Along this interface, at $\approx 135 \degree$ from the horizontal axis, the accumulated shear switches from negative to positive. This area is highlighted in Figure~\ref{fig:shear_pressure_accumulation}
+- Along this interface, at $\approx 45 \degree$ from the horizontal axis, the accumulated shear switches from negative to positive. This area is highlighted in Figure~\ref{fig:roll_up_points}
 - Hence, the point at which the switch occurs is experiencing tension; the interfacial cells adjacent to this cell are being pulled in opposite directions.
 - This provides evidence that this point is where initial droplet roll-up is experienced.
+- Interestingly, a Kelvin-Helmholtz (K-H) instability also arises at this point.
+- This finding somewhat contradicts findings that say the ``pit''  at this particular location is formed because of the interaction with the triple-point of the shock \cite{Xu2024}.
+- The planar shock structure being used for this study does not have a triple-point, unlike Xu's cellular detonation wave. So, in the present case, the surface instability must be responsible for the pit formation.
 
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=0.8\textwidth]{Figures/pressure_and_shear_accumulation.png}
-        \caption{Accumulation of shear stress (top) and pressure (bottom)}
-        \label{subfig:shear_pressure_accumulation_zoomed_out}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{Figures/pressure_and_shear_accumulation.png}
-        \caption{Accumulated shear stress zoomed-in on roll-up point}
-        \label{subfig:shear_pressure_accumulation_zoomed_in_on_rollup}
-    \end{subfigure}
+    \includegraphics[width=0.8\textwidth]{Figures/pressure_and_shear_accumulation.png}
     \caption{Accumulation of shear stress and pressure on the droplet after the shock has passed over the droplet. The shear stress accumulates along the air-water interface whereas the pressure accumulates both on the interface and within the droplet.}
     \label{fig:shear_pressure_accumulation}
 \end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/roll_up_points.png}
+    \caption{(a) Zooming in on the shear stress accumulation in the droplet to see the point at which shear stress switches from positive to negative. (b) Zoomed-in image of the roll-up point, where a mask has been applied to the accumulated shear stress to separate positive and negative shear stress. This elucidates the exact cells that correlate to the roll-up point.}
+    \label{fig:roll_up_points}
+\end{figure}
+
+- Now, this begs the question \textit{does Mach No. affect where this initial roll-up occurs?} To answer this question, this methodology was carried out for droplets at various $M_{shock}$, and the location of the roll-up point was tracked. The results from this can be seen in \ref{fig:roll_up_points_data}.
+- Here, the roll-up point location was tracked in degrees relative to the droplet center, starting from 0\degree at the leading edge of the droplet
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/pressure_and_shear_accumulation.png}
+    \caption{Accumulation of shear stress and pressure on the droplet after the shock has passed over the droplet. The shear stress accumulates along the air-water interface whereas the pressure accumulates both on the interface and within the droplet.}
+    \label{fig:roll_up_points_data}
+\end{figure}
+
+- Another way to understand how droplet deformation can occur is to observe the boundary layer along the droplet's surface.
+- Figure \ref{fig:boundary_layer_v_Mach} shows how the droplet's boundary layer changes with respect to $M_{shock}$, and \ref{fig:BL_diagram} shows where the velocity information was extracted for these boundary layers.
+- The boundary layer is directly related to the shear stress the droplet is experiencing along the interface. 
+- This is a result of Newton's Law of Viscosity, where $\tau_{w} = \mu \left[\frac{\partial u}{\partial y}\right]_{y=0}$. 
+- From this, there are many ways to estimate skin friction and pressure drag given the boundary layer information. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/coplotted_BLs.png}
+    \caption{Droplet's velocity boundary layer for $M_{shock} = 1.0, 2.0,...,10.0$ taken at the location marked in Figure \ref{fig:BL_diagram}.}
+    \label{fig:boundary_layer_v_Mach}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.25\textwidth]{Figures/BL_diagram.png}
+    \caption{Accumulation of shear stress and pressure on the droplet after the shock has passed over the droplet. The shear stress accumulates along the air-water interface whereas the pressure accumulates both on the interface and within the droplet.}
+    \label{fig:BL_diagram}
+\end{figure}
+
+- Figure \ref{fig:boundary_layer_v_Mach} shows that the boundary layers all have a similar shape, and the height of the boundary can be approximated by the location of the maximum velocity in the boundary layer. The maximum velocity is of a similar magnitude as the post-shock velocity once the bow shock has formed around the droplet.
+- Once the boundary layer height is calculated, boundary layer theory can be used to determine the skin friction drag coefficient, $C_{f} = \frac{\tau_{w}}{0.5 \rho U^{2}_{post-shock}}$.
+- Figure \ref{fig:BL_heigh_v_mach} shows the velocity boundary layer height as a function of $M_{shock}$, the location of the maximum velocity is extracted from Figure \ref{fig:boundary_layer_v_Mach} and plotted here.
+- This again shows that the post-shock velocity, and hence, $M_{shock}$, affects the boundary layer height.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/coplotted_BLs.png}
+    \caption{Droplet's velocity boundary layer for $M_{shock} = 1.0, 2.0,...,10.0$ taken at the location marked in Figure \ref{fig:BL_diagram}.}
+    \label{fig:BL_heigh_v_mach}
+\end{figure}
+
+- Using Newton's Law of Viscosity, $\tau_{w}$ can be approximated by replacing the velocity derivative with a finite-difference near the interface.
+- This is done for every cell along the interface before the flow detaches from the droplet ($\theta \approx 150\degree$). Shear force is in the detached region is negligible \cite{Khan2004}. 
+- Now, $\tau_{w}$ is multiplied by $2\pi$ to convert to an axisymmetric value to a full 3D value. \\
+- It may also be possible to estimated the skin friction drag only knowing the boundary layer height.
 
 
 \subsection{Results of One-way Coupled CFD/Cavitation}
@@ -1711,11 +1772,37 @@ The shape characterization methods described in Section \ref{sec:dropShapeMethod
 
 
 \section{CMAS/TBC Infiltration}
-Here the results from the simulations and analytical models are discussed, starting with a mesh sensitivity study, moving on to comparing the analytical models with the numerical results, and finally characterization based on several properties is considered.
+Here, the results from the simulations and analytical models are discussed, starting with a mesh sensitivity study, moving on to comparing the analytical models with the numerical results, and finally characterization based on several properties is considered.
 
-\subsection{Mesh Sensitivity Study}
-A Mesh sensitivity study was conducted based on the infiltration depth at 0.1 s of physical time. The results in Figure \ref{fig:meshSensResults} and Table \ref{tab:meshSensResults} show asymptotic convergence. With such incredibly small variations with coarser mesh sizes, a mesh with a base size of ${1.4x10^{-7}}$ m will be used for further simulations. Performing the formal grid convergence index (GCI) calculations \cite{ECA2014104, celik2008procedure} shows that the results in Table \ref{tab:meshSensResults} imply oscillatory convergence, because  $0<\epsilon_{21}/\epsilon_{32}=\ 0.004<1$, and a GCI of $7.5x10^{-4}$.
-%The physical time to extract the infiltration depth was chosen because beyond that time, error accumulates in the low-fidelity simulation, where the mass of CMAS grows beyond the initial value, causing the result to be non-physical. This non-physical phenomenon can be seen in the coarsest mesh in Figure \ref{fig:mesh-a}, and the result becomes more clear in Figure \ref{fig:mesh-b} - \ref{fig:mesh-d}. 
+\subsection{CFD Model}
+\subsubsection{Benchmark: Capillary Rise in a Circular Tube}
+
+Since CMAS infiltration in a TBC is a capillary-dominated flow, the methodology above must be validated for use with such flows.
+A canonical configuration for a capillary-driven flow is the transient capillary rise in a circular tube.
+This case is typically used when validating multiphase numerical methods \cite{GRUNDING2020142, Shiri2022}. 
+To do this, a 3D cylindrical tube was set up using the same methods described in Section \ref{sec:methods}.
+Constant viscosity water with no solidification model was used in place of the molten CMAS, and the domain was isothermal.
+The tube's dimensions and boundary conditions are shown in Fig.\ref{fig:benchmark_diagram}. Zero pressure gradient boundaries were used to ensure only capillary forces are driving the flow. Only water was allowed to enter the tube, while water and air can exit the tube.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/capillaryRiseDiagram.png}
+    \caption{Diagram showing the dimensions and boundary conditions for the benchmark capillary rise in a tube case.}
+    \label{fig:benchmark_diagram}
+\end{figure*}
+
+Fig. \ref{fig:capillaryRise} shows the volume fraction of water throughout the capillary rise simulation. Here, a meniscus spontaneously forms due to the capillary action at the tube wall. Then, the meniscus continues to ascend. The ascent rate of the meniscus according to an analytical formulation of the Lucas-Washburn equation \cite{HAMRAOUI2002415} should be around 0.32 $m/s$  (Note that this value was achieved ignoring effects of dynamic contact angle, as this phenomenon is ignored in the present study). The ascent rate of the meniscus in this benchmark CFD model is around 0.36 $m/s$. A 12.5\% error is achieved between the analytical Lucas-Washburn equation and the CFD model. The qualitative observations in Fig. \ref{fig:capillaryRise} and the quantitative comparison between the analytical Lucas-Washburn equation and the CFD model demonstrate the ability of the simulation methodology to resolve capillary-driven flow. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/validation_capillaryRise.png}
+    \caption{Simulated capillary flow in a tube at three different stages. From left to right, the flow is initialized halfway up the tube and there is no meniscus. Next, the meniscus spontaneously forms and begins to move upward. Last, the meniscus has moved much further up the tube than where it started. This shows that capillary rise is resolved.}
+    \label{fig:capillaryRise}
+\end{figure}
+
+\subsubsection{Validation: Mesh Sensitivity Study}
+A mesh sensitivity study was conducted where a single CMAS droplet was resolved. The droplet's initial velocity was 0.2 $m/s$, allowing for quick impingement of the TBC. From there, the droplet infiltrates via capillary action as normal. The setup for this is shown in Fig. \ref{fig:mesh}. The infiltration depth at 0.1 s of physical time was extracted for several levels of refinement. The results in Fig. \ref{fig:meshSensResults} and Table \ref{tab:meshSensResults} show convergence. Since results vary incredibly little with finer mesh sizes, a mesh with a base size of ${1.4\times 10^{-7}}$ m will be used for further simulations. Performing the formal grid convergence index (GCI) calculations \cite{ECA2014104, celik2008procedure} shows that the results in Table \ref{tab:meshSensResults} imply oscillatory convergence, because  $0<\epsilon_{21}/\epsilon_{32}=\ 0.004<1$, and a GCI of $7.5\times 10^{-4}$.
+%The physical time to extract the infiltration depth was chosen because beyond that time, error accumulates in the low-fidelity simulation, where the mass of CMAS grows beyond the initial value, causing the result to be non-physical. This non-physical phenomenon can be seen in the coarsest mesh in Fig. \ref{fig:mesh-a}, and the result becomes more clear in Fig. \ref{fig:mesh-b} - \ref{fig:mesh-d}. 
 
 % \begin{figure}[htp!]
 %     \begin{subfigure}{0.5\linewidth}
@@ -1749,13 +1836,13 @@ A Mesh sensitivity study was conducted based on the infiltration depth at 0.1 s 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{Figures/infilDepthMesh.png}
-    \caption{Infiltration Depth (m) as a function of representative mesh size (m}
+    \caption{Infiltration Depth ($\mu m$) as a function of the inverse of representative mesh size ($\mu m ^{-1}$)}
     \label{fig:meshSensResults}
 \end{figure}
 
 \begin{table}[htp!]
     \centering
-    \caption{Table with Mesh Sensitivity Results from Figure \ref{fig:meshSensResults}}
+    \caption{Mesh Sensitivity Results from Fig. \ref{fig:meshSensResults}}
     \begin{tabular}{c|c}
        Representative Mesh Size (m)  & Infiltration depth at 0.1 s (m) \\
        \hline
@@ -1767,34 +1854,46 @@ A Mesh sensitivity study was conducted based on the infiltration depth at 0.1 s 
     \label{tab:meshSensResults}
 \end{table}
 
-\subsection{Results From open-pipe, concentric-pipe, planar Channel, and Feathery Channel Simulations}
+\subsubsection{2D CFD Model}
+In Section \ref{sec:methods}, it is mentioned that the boundary conditions on the 2D model make it such that it is not strictly a capillary-driven flow, but also inertially-driven. This has unintneded consequences on the results. The limitations in the 2D model causes the flow to reach a state of equilibrium, as seen in Fig. \ref{fig:rect_v_feather}. This phenomenon is non-physical, since the CMAS should continue to infiltrate instead of reach a point of equilibrium \cite{Naraparaju2017}. So, the 2D geometry cannot be used to ``resolve'' the infiltration process. However, it is still valuable in the sense that it can demonstrate a microstructure's ability to stop the infiltration under different circumstances.
 
-%Experimental results \cite{Naraparaju2019} for infiltration depth v. time are compared to simulations. These experimental results come from the German Aerospace Center, and the material used for “CMAS 1” is consistent with the material defined in the simulation. Unfortunately, the data is much farther advanced in time and with much less time resolution than the simulation. 
-The simulated results are compared to the analogous analytical pipe models, and experiments described in Naraparaju et. al. \cite{Naraparaju2019}. The formulations for the pipe models can be seen below. 
+To understand the effect of geometry, the 2D CFD results from the rectangular and feathery channel geometries are shown in Fig. \ref{fig:dimensions}.
+Additionally, the 2D CFD results are compared to analytical solutions of the open-pipe and concentric-pipe models (OPM, and CPM respectively) \cite{Naraparaju2019} based on models detailed in Appendix \ref{sec:app:RaviPipeModels}. 
+Fig.~\ref{fig:rect_v_feather} shows the infiltration depth versus time for the rectangular and feathery simulations, co-plotted with the analytical OPM and CPM solutions. 
+Note that the CFD results in Fig.~\ref{fig:rect_v_feather} account for a fluidic viscosity that varies with temperature which is based on polynomial fit to experimentally-measured data \cite{Naraparaju2017}.\\
 
-\begin{equation}
-    t=\frac{\mu r\ h^2}{2\sigma k cos\theta}
-\end{equation}
+First, consider the rectangular and feathery CFD data in Fig.~\ref{fig:rect_v_feather}.
+These CFD results show that the feathery channel works to mitigate infiltration as compared to the rectangular channel. Such an inference can be drawn from the CMAS infiltrating to shallower depths for the feathery channel compared to the rectangular channel. 
+% Next, consider the circular and annular CFD results in Fig.~\ref{fig:rect_v_feather}, which differ as they depict a constant value for both cases.
+% These differences are associated with the CMAS flow in the circular and annular channels results reaching an equilibrium at essentially the initial condition. 
+% Such a result may seem counter-intuitive at first, however, it is supported by capillary flow theory.
+% Capillary flow in small tubes is driven by the inertial response time \cite{Weislogel}, $t_{R}  \thicksim \sqrt{\frac{\rho R^{3}}{\sigma}}$; since the radius of the tube is small, the inertial response time is on the order of $1\times 10^{-9} s$. This is much smaller than the minimum time-step of the CFD simulations.
+% Therefore, CMAS infiltration flow reaches an equilibrium immediately.
+%Experimental results \cite{Naraparaju2019} for infiltration depth versus time are compared to simulations. These experimental results come from the German Aerospace Center, and the material used for “CMAS 1” is consistent with the material defined in the simulation. Unfortunately, the data is much farther advanced in time and with much less time resolution than the simulation. 
 
-\noindent here, t is the infiltration time, r is the radius open for infiltration, h is the infiltration depth, $\mu$,$ \sigma$, $\theta$ are viscosity, surface tension, and contact angle respectively \cite{Naraparaju2017,ZHAO201474}. The parameter k represents the porosity and varies depending on whether the open-pipe or concentric-pipe model is being used. Some difficulties arise here, as some of the properties in the above equation vary nonlinearly with temperature, so initial values will be used for the calculations. The open-pipe model defines k as the following
 
-\begin{equation}
-    k_o=\frac{r^2\phi^2}{8\tau\left(1-\phi\right)^2}
-\end{equation}
+To understand the evolution of CMAS attack, the time history of the CMAS distribution is discussed. 
+The effort starts with data extracted from the CFD results. The CFD time history is plotted in Fig.~\ref{fig:rect_v_feather} and, at several points of interest in time, contour plots of the CMAS volume fraction and TBC temperature are plotted in Fig. \ref{fig:feathery_timehistory}. In the contour plots, the red/gray area shows the distribution of air and CMAS, and the red-orange gradient shows the temperature distribution within the TBC (with isocontours in intervals of 1 K). First, consider the initial infiltration in both the rectangular and feathery channels on a time interval from $t=0$ to $t=0.001 s$ in Fig.~\ref{fig:rect_v_feather}.
+This early infiltration occurs much faster and the rate of infiltration appears to significantly slow down thereafter. 
+Such an fast infiltration occurring early is a result of the conical shape of the micro structure in the coating, shown in Fig.~\ref{fig:feathery_timehistory}. It appears to work much like a converging nozzles, where the flow accelerates with the reduction of the cross-sectional, interstitial area. 
 
-\noindent here $\phi$ is the overall pore fraction, and $\tau$ is a geometric factor based on a ratio of area of the column to area of the feather arms, and it was found to be 2.31 for feathery microstructures \cite{Naraparaju2019}.The concentric-pipe model is similar, but defines k as
+Now consider a later time interval range from $t=0.001 - 0.13 s$ in Fig.~\ref{fig:feathery_timehistory}.
+At $t \approx 0.05s$, the infiltration rates of the rectangular and feathery channels diverge.
+There, the infiltration in the rectangular channel continues at a faster rate than in the feathery channel.
+At $t \approx 0.13 s$, the CMAS in the feathery channel reaches an equilibrium state and no longer infiltrates. Concurrently, the infiltration in the rectangular channel shows a trend that indicates it begins to slow down.
+Lastly, after $t \approx 0.15 s$, the infiltration in the rectangular channel eventually reaches an equilibrium as well.
+It is important to emphasize that the infiltration in the feathery channel reaches an equilibrium faster and penetrates to shallower depths than in the rectangular channel.
+Such an observation is consistent with previous experimental results \cite{Naraparaju2017} and further demonstrates the effectiveness of feathery TBCs to resisting CMAS attack.
 
-\begin{equation}
-    k_o=\frac{\phi}{8\tau^2}b^2\left[1+\frac{a^2}{b^2}+\left(1-\frac{a^2}{b^2}\right)\frac{1}{ln\left(a/b\right)}\right]
-\end{equation}
+In further evaluation of the results, it can be observed from Fig. ~\ref{fig:feathery_timehistory} when focusing on the distribution of air and CMAS that air pockets form within the infiltrated CMAS.
+With respect to this, recall that the the thermal conductivity of air is $1-2$ orders of magnitude lower than that of the TBC and CMAS (depending on the temperature). Such air pockets can also not support convection. Hence, the air pockets potentially contribute to a decrease of thermal conductivity in a TBC that has experienced CMAS attack.
 
-\noindent where a and b are the outer radii of the concentric-pipes \cite{Naraparaju2019}. 
+In Fig.~\ref{fig:feathery_timehistory}(center) and ~\ref{fig:rect_timehistory}(center), a developing temperature profile is seen within the TBC. The temperature profile develops as energy is absorbed by the CMAS moving downward and that energy is conducted back into the TBC. 
+In Fig.~\ref{fig:feathery_timehistory}(right), after further infiltration, the temperature profile switches directions along the TBC interface.
+This happens because more energy is being redirected to satisfy the latent heat of fusion of CMAS. The CMAS is effectively cooling the TBC.
+This effect is less drastic in Fig.~\ref{fig:rect_timehistory} because there is overall less infiltrated CMAS available for energy absorption.
 
-The results of the benchmark to the analytical models are shown in Figure \ref{fig:rect_v_feather}. Results from the open-pipe and concentric-pipe simulations are omitted because the simulated results contradict the analytical model. That is, when the simulation starts, the CMAS is already at it's equilibrium point. This is the case regardless of the initial depth, or of the properties of the CMAS, because the driving factor is the incredibly small radius of the tube, making the inertial response time,$t_{R} ~ \sqrt{\frac{\rho R^{3}}{\sigma}}$, of the flow on the order of $1\times 10^{-13} s$ \cite{Weislogel}. This of course, does not align with the outcomes of the open-pipe and concentric-pipe models \cite{Naraparaju2019}. This shows that the analytical open and concentric-pipe models are not capable of predicting the flow in one isolated channel without considering that channel's porosity to CMAS.
-
-However, once porosity effects are considered in the form of geometry changes (i.e. the planar channel and the feathery channel), some meaningful results are captured. Figure \ref{fig:rect_v_feather} shows infiltration depth v. time for both the feathery and planar micro-channel.  Importantly, this verifies that the feathery micro-channel causes less infiltration than a planar channel with the same inter-columnar gap. Figure \ref{fig:rect_v_feather} also shows the analytical relations for the open and concentric-pipe models. Note that the non-constant viscosity is accounted for as the depth increases using the experimentally-measured viscosity data \cite{Naraparaju2019}, and the temperature gradient in Table \ref{tab:boundaryConditions}. This is not a direct comparison because porosity is handled differently in those models, but the results are at least of the same order of magnitude. It should be noted that the pipe models do not equillibrate, however, because of the basis in Darcy's Law. This provides evidence that data from resolving the flow in one TBC column cannot be extrapolated to the bulk flow in the porous network of columns. Further 3D evaluations are needed to compare to these analytical models. 
-
-Figure \ref{fig:infilResult} shows the volume fraction of CMAS and the TBC temperature for simulations with and without a solidification model enabled, once the infiltration has reached equilibrium. In both cases, air pockets tend to form within the infiltrated CMAS. This supports the argument that the infiltrated CMAS can alter the thermal properties of the coating. Even at these high temperatures, the thermal conductivity of air is still two orders of magnitude smaller than that of the TBC and the CMAS, so the air pockets would certainly affect the conductivity of the resulting TBC/CMAS mixture. Figure \ref{fig:infilResult} also shows that the presense of a solidification model can change the final equilibrium depth, meaning that the overall infiltration kinetics may not be able to be resolved with viscous effects alone.
+One discrepancy between these results and previous work is that the meniscus of the CMAS/air interface is convex in Figures \ref{fig:feathery_timehistory} and \ref{fig:rect_timehistory}. Previous work suggests that this meniscus should be concave \cite{Naraparaju2019}. This discrepancy is likely caused by the initial condition in the CFD simulation. That is, the flow is driven by a pressure gradient and capillary action, as opposed to being driven by capillary action from the start. Another discrepancy between experiments, analytical models, and 2D CFD is that the CMAS in the 2D CFD model reaches a state of equilibrium, rather than continuing to infiltrate. This limitation could be fixed with more mesh resolution at the CMAS/Air interface so that the capillary action is properly resolved, but the numerical methods being used here do not support AMR in 2D simulations. Hence, a 3D model is necessary to properly resolve the capillary-driven part of this phenomenon. 
 
 % \begin{figure}[h!]
 %     \centering
@@ -1805,17 +1904,24 @@ Figure \ref{fig:infilResult} shows the volume fraction of CMAS and the TBC tempe
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{Figures/Rect_v_feather.png}
-    \caption{Comparison of infiltration depth v. time for the planar micro-channel, and feathery micro-channel co-plotted with the expected results from analytical pipe models. The feathery channel equillibrates at a shorter depth and shorter time than the planar channel.}
+    \includegraphics[width=\linewidth]{Figures/2d_results.png}
+    \caption{Comparison of infiltration depth versus time for the 2D CFD model's rectangular and feathery micro-channels co-plotted with the analytical pipe model results. Note that the feathery channel reaches an equilibrium at shallower depths at a shorter time than the rectangular channel.}
     \label{fig:rect_v_feather}
 \end{figure}
 
-\begin{figure}
+\begin{figure*}
     \centering
-    \includegraphics[width=\linewidth]{Figures/infilResults.png}
-    \caption{Image of the feathery TBC simulation showing the volume fraction of CMAS and the temperature of the TBC. In the simulation that did not use a solidification model (left), it is easy to see that bubbles and air pockets tend to form within the CMAS. The image with a solidification model  (right) shows that the presence of a solidification model can cause the infiltration to stop at a smaller equilibrium depth. }
-    \label{fig:infilResult}
-\end{figure}
+    \includegraphics[width=\linewidth]{Figures/featheryTimeHistory.png}
+    \caption{Time history of the feathery TBC simulation showing the volume fraction of CMAS and the temperature of the TBC (for $Oh_{initial} \approx 115$ to $Oh_{final} \approx 1300$). The left ($t \approx 2\times 10^{-5}s$) image shows the initial conical infiltration, the middle image ($t\approx 0.005 s$) shows CMAS as it infiltrates the feather arms, and the right image ($t \approx 0.13 s$) is the equilibrium point. Note that the isolines in the TBC represent the thermal gradient, where the temperature at each isoline is 1 K less than the one above it.}
+    \label{fig:feathery_timehistory}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/rect_timeHistory.png}
+    \caption{Time history of the rectangular TBC simulation showing the volume fraction of CMAS and the temperature of the TBC (for $Oh_{initial} \approx 115$ to $Oh_{final} \approx 1300$). The left image ($t \approx 1\times 10^{-5}s$) shows the initial conical infiltration, the middle image ($t \approx 0.1 s$)shows CMAS as it infiltrates the thin rectangular channel, and the right image ($t \approx 0.4 s$) is the equilibrium point. Note that the isolines in the TBC represent the thermal gradient, where the temperature at each isoline is 1 K less than the one above it.}
+    \label{fig:rect_timehistory}
+\end{figure*}
 
 % The results from the experiments, pipe models, and the simulation are summarized in Table \ref{tab:resultsSummary}.
 
@@ -1828,29 +1934,72 @@ Figure \ref{fig:infilResult} shows the volume fraction of CMAS and the TBC tempe
 %         Experiment & 120 & 125\\
 %         Open-pipe & 120 & 176\\
 %         Closed-pipe & 120 & 95\\
-%         planar micro-channel Simulation & 120 & 45 (extrapolated) \\
+%         rectangular micro-channel Simulation & 120 & 45 (extrapolated) \\
 %         Feathery micro-channel Simulation & 120 & 45 (extrapolated)
 %     \end{tabular}
 %     \label{tab:resultsSummary}
 % \end{table}
 
-% \noindent Figure \ref{fig:ODEvSim_Oh_nonconstant} shows how system of ODEs is solved, and compared to the simulation data. Here, the analytical solution for capillary flow in a "feathery" micro-channel and the simulated solution for the same flow agree fairly well. An important note is that to attain this good agreement, the Ohnesorge number was linearly increased at each timestep in the solution of the ODE system. This was meant to replicate the linearly increasing viscosity, and eventual solidification, of the particle in the channel. This is important because it provides further evidence that capillary flow is not the only dominant feature in the infiltration of CMAS into a TBC.
+% \noindent Fig.\ref{fig:ODEvSim_Oh_nonconstant} shows how system of ODEs is solved, and compared to the simulation data. Here, the analytical solution for capillary flow in a "feathery" micro-channel and the simulated solution for the same flow agree fairly well. An important note is that to attain this good agreement, the Ohnesorge number was linearly increased at each timestep in the solution of the ODE system. This was meant to replicate the linearly increasing viscosity, and eventual solidification, of the particle in the channel. This is important because it provides further evidence that capillary flow is not the only dominant feature in the infiltration of CMAS into a TBC.
 
 % \begin{figure}[htp!]
 % \centering
 % \includegraphics[width=.7\linewidth]{Figures/ODEsolution.png}
-% \caption{Comparison of simulation and analytical infiltration depth v. time (non-dimensional).}
+% \caption{Comparison of simulation and analytical infiltration depth versus time (non-dimensional).}
 % \label{fig:ODEvSim_Oh_nonconstant}
 % \end{figure}
 
-\subsection{Results for novel feathery pipe-network model}
+\subsubsection{3D CFD Model}
 
-Figure \ref{fig:pipeNetworkResults} shows how the analytical solution to the ODE described in Section \ref{sec:pipeNetworkMethod} compares to the analytical solution from the open and concentric-pipe models, as well as the simulated results for the feathery and planar channel flow. Here, it is seen that the pipe network model more closely resembles the simulated results at the beginning of the infiltration; the simulated results and pipe network both infiltrate much quicker than the open and concentric-pipe models at first. As the infiltration continues however, the pipe network result does not change as sharply as the simulated result, and also does not equillibrate. Results for infiltration depth at 120 s for all three analytical models are summarized in Table \ref{tab:resultsCompare}. Table \ref{tab:resultsCompare} and Figure \ref{fig:pipeNetworkResults} show that the result from the pipe network model becomes bounded between the open-pipe and concentric-pipe models. Therefore, the pipe-network model is more in-line with experimental results than the open-pipe and concentric-pipe models \cite{Naraparaju2019}. 
+While the 2D model was unable to attain spontaneous capillary flow, the CMAS in the 3D model was able to spontaneously form a meniscus, and infiltrate the TBC without the assistance from an external pressure gradient. Hence, this model can reasonably resolve the actual physical processes in the CMAS infiltration, rather than just a comparison tool like the 2D model. 
+
+The infiltration depth as a function of time for the 3D model is shown in Fig. \ref{fig:3D_results}. The reults from the 3D model, 2D models, OPM, and CPM are compared. Fig. \ref{fig:3D_results} shows that the CMAS in the 3D CFD model does not reach a point of equilibirum, as the 2D CFD does, and the shape of the infiltration versus time curve is similar to that of OPM and CPM. 
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/3D_results.png}
+    \caption{Infiltration depth versus time for the 3D CFD model. Here, the simulation data is plotted along with a curve-fit of that data in order to extrapolate past the simulated time.}
+    \label{fig:3D_results}
+\end{figure*}
+
+The time resolution of experimental measurements is very low, with measurements taking place every few minutes during infiltration \cite{Naraparaju2017}. The first data point that can be compared to is taken at 120 s. One drawback of the 3D CFD model is the time it takes to run. Even on an HPC system using 4 Intel Xeon Platinum 8558 processors (192 compute cores), it still takes nearly a week to run the 3D CFD model to 0.1 s of physical time. As a result of this, to compare to experiments, the 3D CFD infiltration versus time data must be fitted to a curve, and the depth at 120 s must be extrapolated to compare to the experiments. The fitted curve is shown in Fig. \ref{fig:3D_results}, and the extrapolated depth at 120 s is shown in Table \ref{tab:resultsCompare}. Note that the time-period where the meniscus was forming was excluded from the curve-fit. The extrapolated depth of the 3D CFD model at 120 s is ~50 $\mu m$. So, the 3D CFD model under-predicts the infiltration depth compared to all other models. This under-prediction can be partially explained by the 
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/3D_timehistory.png}
+    \caption{Time history of the feathery 3D CFD model showing the volume fraction of CMAS and the temperature of the TBC. The left image ($t \approx 1\times 10^{-3}s$) shows the initial infiltration, where the meniscus begins to spontaneously form, the middle image ($t \approx 0.12 s$) shows the CMAS as it begins to enter the first feather gap, and the right image ($t \approx 0.035 s$) shows the CMAS as fully infiltrating the feather arms, and continuing to move down the TBC. Note that the isolines in the TBC represent the thermal gradient, where the temperature at each isoline is 1 K less than the one above it.}
+    \label{fig:3D_timehistory}
+\end{figure*}
+
+Importantly, the prediction from the extrapolated curve is in between the results from OPM and CPM in Fig. \ref{fig:3D_results}. Experimental measurements at 120 s are also between the predictions for OPM and CPM \cite{Naraparaju2017}. So, the 3D CFD model is more closely aligned with experimental results than the present theoretical models. This is beneficial because it allows more accurate predictions, but since the 3D CFD model is so computationally expensive, it is worth looking for a simpler model, such as FPNM. However, this is only the case at small time scales. At larger timescales, the 3D CFD model under-predicts the infiltration, as seen in Table \ref{tab:resultsCompare}. 
+
+Fig. \ref{fig:3D_timehistory} shows images of the CMAS infiltration at several important time points. Fig. \ref{fig:3D_timehistory} (left) shows the meniscus spontaneously forming, and the CMAS beginning to move downward from its original state. Then, Fig. \ref{fig:3D_timehistory} (center) shows the CMAS starting to enter the feather gaps as it creeps along the TBC walls. Interestingly, in Fig. \ref{fig:3D_results}, there are brief pauses in the infiltration (like between $t=0.015 s and t=0.0175 s$). These pauses seem to correlate periods where the flow in the primary gap stops, but the flow in the feather gaps continues. The flow must reach a certain point in the feather gap for the CMAS to continue to infiltrate the primary channel. This phenomena occurs between the timepoints in Fig. \ref{fig:3D_timehistory} (center) and Fig. \ref{fig:3D_timehistory} (right).
+
+\subsection{FPNM: Benchmarks with CFD, Conventional Models, and Experiment}
+%Comparison of analytic and CFD results to evalaute analytic model accuracy. 
+Consider infiltration comparisons of the newly formulated FPNM model to results from the OPM, CPM, and the CFD models. 
+Results are plotted in Fig. \ref{fig:pipeNetworkResults}, with comparisons of FPNM (Eq.~\ref{eq:FPNM_dimensional}), OPM (Eq.~\ref{eq:oPM}), and CPM (Eq.~\ref{eq:CPM}). The CFD results are based on the model described in Fig.~\ref{fig:rect_v_feather}. 
+The FPNM infiltration was calculated with both constant viscosity ($\mu = 5.65$ Pa$\cdot$s) and temperature-dependent viscosity, while OPM and CPM were only calculated with constant viscosity.
+In the early stages of this comparison $(t<0.025s)$, it can be observed that the FPNM provides an improved correlation with the CFD results compared to the OPM and CPM models. The improved agreement is observed in the initially rapid infiltration rate from the FPNM. 
+As time evolves to $t\approx0.5s$, the FPNM tends to be more in-line with OPM and CPM. The CFD model results shows an equilibrium infiltration depth, whereas the FPNM, OPM, and CPM results indicate that equilibrium is not achieved. 
+Additionally, at times beyond $0.5s$, the FPNM also appears to be bounded by the OPM and CPM results. 
+To summarize the results, the three model results at $120 s$, and a measured experimental result are summarized in Table \ref{tab:resultsCompare}. The CFD results are not included in this table because the infiltration equilibrates in the CFD, so the results are not directly comparable.
+Table \ref{tab:resultsCompare} shows that the experimentally measured infiltration is also bounded between OPM and CPM.
+However, FPNM is closer to the experimental result than OPM. 
+Thus, the results demonstrate that the FPNM enhances the predictions of infiltration depth for CMAS attack.
+
+One aspect the FPNM does not take into account is the solidification of the CMAS. As the CMAS approaches the solidification onset temperature, it will tend to slow down not just due to an increase in viscosity, but because the CMAS itself will begin to crystallize \cite{Naraparaju2019}. This process occurs beyond what is calculated in Fig.\ref{fig:pipeNetworkResults} for FPNM, OPM, and CPM. However, this shows that FPNM is over-predicting the infiltration depth. If a solidification model were included in FPNM, it would align even closer to experimental results.
+
+Another advantage of the FPNM is its computational efficiency. While it is not as efficient as a purely algebraic model, like OPM or CPM, it is far more efficient than a fully-fledged CFD model. The computational time required to solve the FPNM equation is on the order of minutes whereas the CFD models could take hours for a 2D model or days for a 3D model. Thus, the FPNM is a compromise between the speed of OPM/CPM, and the accuracy of CFD. The speed of FPNM also allows for quick evaluation of different material properties. The ability to solve FPNM incrementally also allows the addition of additional non-linear steps to the solver, such as solidification, or other temperature-dependent properties. The speed of FPNM could be further optimized using parallelization. 
+
+
+
+%Fig. \ref{fig:pipeNetworkResults} shows how the analytical solution to the ODE described in Section \ref{sec:pipeNetworkMethod} compares to the analytical solution from the open and concentric-pipe models, as well as the simulated results for the feathery and rectangular channel flow. Here, it is seen that the pipe network model more closely resembles the simulated results at the beginning of the infiltration; the simulated results and pipe network both infiltrate much quicker than the open and concentric-pipe models at first. As the infiltration continues however, the pipe network result does not change as sharply as the simulated result, and also does not equillibrate. Results for infiltration depth at 120 s for all three analytical models are summarized in Table \ref{tab:resultsCompare}. Table \ref{tab:resultsCompare} and Fig. \ref{fig:pipeNetworkResults} show that the result from the pipe network model becomes bounded between the open-pipe and concentric-pipe models. Therefore, the pipe-network model is more in-line with experimental results than the open-pipe and concentric-pipe models \cite{Naraparaju2019}. 
 
 \begin{figure}[htp!]
     \centering
     \includegraphics[width=\linewidth]{Figures/analytical.png}
-    \caption{Depth v. Time for the simulated results, analytical pipe models, and the proposed pipe-network model.}
+    \caption{Depth versus time for the CFD, analytical pipe models, and the proposed FPNM (with both a constant viscosity and temperature-varying viscosity solution).}
     \label{fig:pipeNetworkResults}
 \end{figure}
 
@@ -1863,68 +2012,126 @@ Figure \ref{fig:pipeNetworkResults} shows how the analytical solution to the ODE
 Experiment & 125\\
 Open-pipe & 176\\
 Concentric-pipe & 95\\
-Feathery Pipe-Network & 154
+Feathery Pipe-Network Model & 154\\
+3D CFD Model & 50
 \end{tabular}
 \end{table}
-\subsection{Characterization Based on Ohnesorge Number}
 
-The effect of viscosity and surface tensions on the flow can be summarized using the Ohnesorge Number, ($Oh$). The planar and feathery micro-channel simulations were reevaluated, replacing the experimentally measured viscosity with a constant viscosity, while the surface tension was held constant. Thus, a range of $Oh$ were evaluated for both channels to understand how the ratio of viscous forces to inertial and surface tensions forces affects the infiltration time. Figure \ref{fig:rect_v_feather_oh} plots the non-dimensional equilibrium point (where $D^{*} = D/b$, $b$ is the columnar gap width) against infiltration depth for various $OH$. An interesting result is that, at lower $Oh$, the planar micro-channel is more effective at inhibiting infiltration, but around $Oh=500$, this trend switches, and the feathery microstructure becomes more effective.
+\subsection{Geometric Parameterization with FPNM}
+
+The quick solutions offered by FPNM (the ODE can be solved in minutes, whereas CFD can take hours or days) allows for easy manipulation of geometric parameters without the need to change a physical model, remesh, and rerun the solution every time. Hence, it is advantageous to use FPNM to study how the geometric parameters of the TBC affect the CMAS infiltration.
+
+First, the affect of the intercolumnar gap, $B$, was analyzed, and the results are shown in Fig. \ref{fig:columnGapStudy}. 
+Here, it is shown that larger intercolumnar gaps lead to faster infiltration, and this effect scales nonlinearly, meaning larger gaps allow exponentially faster infiltration. 
+This data is supported by other's numerical efforts evaluating the TBC microstructure \cite{Sirigiri2018}.
+A good analogy to describe why this physically makes sense is blood flow. When arterioles and venules bifurcate and becomes smaller, their flow-resistance becomes larger, because the resistance is inversely proportional to $R^{4}$ \cite{Chandran2012}. So, it can be said that smaller intercolumnar gaps increase the TBC's resistance to infiltration.
+
+\begin{figure}[htp!]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/intercolumnarGapStudy.png}
+    \caption{Depth versus time for various intercolumnar gap widths using FPNM.}
+    \label{fig:columnGapStudy}
+\end{figure}
+
+Similarly, the feather gap width, $b$, was evaluated, and results are shown in Fig. \ref{fig:featherGapStudy}. 
+Here, larger feather gaps lead to faster overall infiltration in the primary channel, because the CMAS must fully infiltrate the feather gaps before it can move further down the primary channel. Hence, increasing the flow resistance at the feather gap increases the overall resistance. 
+However, decreasing the feather gap width had diminishing returns, after $b = 2 \mu m$, the infiltration is not mitigated nearly as much as before $b=2 \mu m$.
+
+\begin{figure}[htp!]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/featherGapStudy.png}
+    \caption{Depth versus time for various feather gap widths widths using FPNM.}
+    \label{fig:featherGapStudy}
+\end{figure}
+
+The results in Fig. \ref{fig:columnGapStudy} and Fig. \ref{fig:featherGapStudy} elucidate an important ratio,  $B^{*} = B/b$. As $B^{*}$ increases, the infiltration will become slower. Designing TBC microstructures around this ratio will lead to more effective infiltration mitigation.
+
+The feather angle can also influence the infiltration characteristics. Infiltration depth versus time for several feather angles are shown in Fig. \ref{fig:angleStudy}. It is shown that larger feather angles tend to increase the infiltration speed, while smaller angles decrease the infiltration speed. However, increasing the feather angle has a greater effect than decreasing it.
+
+\begin{figure}[htp!]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/featherAngleStudy.png}
+    \caption{Depth versus time for various feather angles widths using FPNM.}
+    \label{fig:angleStudy}
+\end{figure}
+
+\subsection{Characterization Based on Ohnesorge Number with CFD and FPNM}
+
+In an effort to better understand micro-scale flows, we look at a more generalized fluid flow in the microstructures shown in Fig. \ref{fig:dimensions}. We are particularly interested in whether bringing the feathery microstructure into the broader world of microfluidics has any desirable effects. For this effort, the effect of viscosity and surface tension are evaluated. These are captured in the Ohnesorge Number, ($Oh$), a dimensionless number that represents the ratio of the viscous forces to the inertial and interfacial forces ($Oh = \mu / \sqrt{\rho \sigma L}$). 
+The rectangular and feathery micro-channel simulations were reevaluated, replacing the experimentally measured viscosity with a constant viscosity, while the surface tension was held constant.
+Similarly, different $Oh$ were used as inputs for FPNM.
+Note that constant viscosity would not be a great assumption for the CMAS/TBC problem. However, the goal here is to generalize the approach for potential applications outside of CMAS infiltration in TBCs.
+To provide some context, the CMAS in a simulation with the temperature-dependent viscosity would vary from 
+$Oh\approx 10$ at the initial condition to $Oh \approx 100$ at its maximum depth. So this analysis allows evaluation of materials outside of that range.
+Hence, a range of $Oh$ were evaluated to understand how $Oh$ affects the infiltration time in the CFD model, and FPNM. 
+Fig. \ref{fig:rect_v_feather_oh} plots the non-dimensional equilibrium point (where $D^{*} = D/b$, $b$ is the columnar gap width) against infiltration depth for various $Oh$. 
+An interesting result is that, at lower $Oh$, the rectangular micro-channel is more effective at inhibiting fluid flow, but around $Oh=500$, this trend switches, and the feathery microstructure becomes more effective. Additionally, at low $Oh$, there is also a very high sensitivity to the input $Oh$.  
+From these studies, we see that the feathery structures are not always most effective and that there are regions where viscosity and surface tension parameters can play a critical role in two-phase flow in different microstructure geometries. 
 
 \begin{figure}[htp!]
     \centering
     \includegraphics[width=\linewidth]{Figures/Rect_feather_compare.png}
-    \caption{Non-dimensional equilibrium depth v. $Oh$ for the planar and feathery micro-channels. At lower $Oh$, the feathery microstructure allows the molten liquid to infiltrate further than the planar channel. However, around $Oh = 500$, this switches, and the feathery channel is more effective at stopping infiltration.}
+    \caption{Non-dimensional equilibrium depth versus $Oh$ for the rectangular and feathery micro-channels using the CFD model. At lower $Oh$, the feathery microstructure allows the molten liquid to infiltrate further than the rectangular channel. However, around $Oh = 500$, this switches, and the feathery channel is more effective at stopping infiltration.}
     \label{fig:rect_v_feather_oh}
 \end{figure}
 
+Fig. \ref{fig:FPNM_Oh} shows how the infiltration as a function of time is affected by $Oh$ in FPNM. Here, it is shown that as viscous effects begin to dominate the infiltration process, the liquid tends to infiltrate slower. However, as surface tension dominates the flow, the liquid tends to infiltrate faster. Hence, the viscosity of the liquid acts as a resistive force, impeding infiltration whereas the surface tension acts as a compliant force, allowing infiltration.
+
+\begin{figure}[htp!]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/OhStudy.png}
+    \caption{Infiltration depth versus time with various $Oh$. Constant viscosity FPNM was used for each calculation.}
+    \label{fig:FPNM_Oh}
+\end{figure}
+
 \subsection{Characterization Based on Solidification}
-The simulation was run with the experimental viscosity model, this time enabling the solidification model described in Figure \ref{sec:solidmodel}. Results in \ref{fig:solidification} show the infiltration in both the feathery and planar channel without the solidification model, and with the solidification model at varying levels of flowability threshold (the relative solid volume fraction in the cell where the flow will stop).
+\label{sec:solidificationCharacterization}
+The effort now moves to evaluate the effect of solidification on the infiltration time.
+Such studies are developed using simulations that have an experimentally-measured viscosity (see Table~\ref{tab:CMAS and TBC properties}\cite{Naraparaju2017}), which couples to the solidification model described in Eq.~\ref{eq:solidificationModel}. In Fig.~\ref{fig:solidification}, are extracted the infiltration depth versus time for both the feathery and rectangular channels. 
+To evaluate the sensitivity of the flowability threshold (FT), the parameter was varied in each simulation.  and Fig.~\ref{fig:solidification} compares these results to the result without solidification.
 
 \begin{figure}[htp!]
     \centering
     \includegraphics[width=\linewidth]{Figures/solidificationStudy.png}
-    \caption{Depth v. time for the feathery and planar micro-channels with solidification, turned off, and solidification turned on, with varying flowability threshold.}
+    \caption{Infiltration depth versus time for the feathery and rectangular micro-channels with solidification (using a range of flowability thresholds) compared to no solidification.}
     \label{fig:solidification}
 \end{figure}
 
-Clearly, the flowability threshold affects both the equilibrium depth and the time to equilibrate. However, no clear pattern is seen here. Low flowability threshold tends to produce flow similar to the flow without solidification enabled. Larger flowability thresholds produce more dissimilar results, but the equilibrium depth can either be lower or higher than the no solidification case. Some results also overlap perfectly, which suggests that after some threshold is crossed, the result will not change. These similar cases also take longer to equilibrate and equilibrate at further depths. Due to the inexplicable variability in these results, it is perhaps best to account for solidification via increasing viscosity rather than using an actual solidification model.
+Further evaluation of Fig. ~\ref{fig:solidification} demonstrates the clear character that $FT$ affects both the equilibrium depth and the equilibrium time. 
+The Infiltration with the low $FT$ values (i.e., $FT=0.015$) tends to behave similarly to infiltration without solidification. 
+Interestingly, as $FT$ increases, the infiltration follows a less clear, non-monotonic pattern. 
+That is, the equilibrium depth for larger $FT$ cases indicated 
+%either be deeper or 
+shallower equilibrium infiltration depths as compared to no solidification, but the response does not indicate a monotonic reduction in the depth as $FT$ decreases. 
+For example, the infiltration profile for $FT=0.75$ and $FT=0.95$ are very similar.
+Such overlap suggests that after some threshold is crossed, the result will not change (i.e., the effect is saturated). 
+It is interesting to point out that these cases also have a longer time to equilibrium and equilibrate at the deepest infiltration depths. 
+In general, as the $FT$ value decreases, solidification appears to decrease the infiltration depth. 
+Note that not including solidification may most desirable as it provides a good measure of a conservative, ``worst-case scenario'' and therefore aims to approximately bound the infiltration depth without input uncertainty associated with $FT$.
 
-\subsection{Characterization Based on Viscosity}
-In this study, two different formulations of the CMAS dynamic viscosity were evaluated: the GRD viscosity model \cite{Giordano2008}, and experimental viscosity measurements \cite{Naraparaju2019}.  The difference between the experimental and GRD viscosity is shown in Fig. \ref{viscosity}, where the experimental viscosity is higher throughout the entire temperature range. Simulations were run with both the experimental and GRD viscosity, using a temperature-based polynomial to approximate the data. Figure \ref{infilTimeVisc} shows that the infiltration time for the experimental viscosity is around 2.5x slower as the GRD viscosity. However, the infiltration times measured here are several orders of magnitude faster than those measured in experiments \cite{Naraparaju2019} if the infiltration rate curves are extrapolated out to the experimental TBC depth \cite{Stein2023}. 
+ \subsection{Characterization Based on Temperature Gradient}
 
-Computational results from other work show a larger difference between the experimental and numerical infiltration times \cite{Sirigiri2018}. However, those results treated both the experimental and GRD viscosity as constant values of 6, and 0.6 Pa-s respectively. Those results also did not account for conjugate heat transfer effects or the existence of air in the domain (i.e. no surface tension effects). So it makes sense that the results presented here would show overall longer infiltration times. The results presented in this section also do not account for any melting-solidification processes and have the same starting temperature such that the particle is fully-liquid throughout the simulation. An image of how the viscosity varies with temperature throughout the domain is shown in Fig. \ref{fig:TempAndVisc}.
+A key property of a TBC is its ability to reduce the temperature between the hot engine flow, and the substrate material. So, TBCs with different temperature gradients between the top and bottom would offer varying degrees of thermal protection. Now, we seek to understand how the temperature gradient in the TBC would affect the degree of CMAS mitigation ability. Both the 3D CFD model and FPNM were evaluated when under temperature gradients, $\Delta T_{x}$ of 0.1, 1, and 10 $K/\mu m$. The results from this are shown in Fig. \ref{fig:tempGradFPNM} and Fig. \ref{fig:tempGradCFD}
 
 \begin{figure}[htp!]
-\centering
-\includegraphics[width=.5\textwidth]{Figures/viscosity.png}
-\caption{Experimental v. GRD Viscosity Curves}
-\label{viscosity}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/tempGradStudy.png}
+    \caption{Infiltration depth versus time for the feathery micro-channels using FPNM. The temperature gradients $\Delta T = - 1 K/\mu m$ and $\Delta T = - 10 K/\mu m$ both make the CMAS reach its maximum viscosity (the temperature at which the CMAS is fully solid) very quickly, so the curves overlap.}
+    \label{fig:tempGradFPNM}
 \end{figure}
+
+Fig. \ref{fig:tempGradFPNM} shows that less intense temperature gradients in the TBC lead to somewhat faster infiltration. Beyond a certain point, however, more intense temperature gradients do not lead to less infiltration. This is because maximum viscosity limit imposed on the model. Once the CMAS is considered solidified, the viscosity is no longer changing. So, if the CMAS reaches the solidification viscosity within the first few $\mu m$, then the infiltration will remain constant afterward. This is why the curves for $\Delta T_{x} = 1 K/\mu m$ and $\Delta T_{x} = 10 K/\mu m$ overlap in Fig. \ref{fig:tempGradFPNM}.
 
 
 \begin{figure}[htp!]
-\centering
-\includegraphics[width=.5\textwidth]{Figures/viscosity_v_time_curves.jpg}
-\caption{Experimental v. GRD Infiltration Time}
-\label{infilTimeVisc}
+    \centering
+    \includegraphics[width=\linewidth]{Figures/tempGradStudyCFD.png}
+    \caption{Infiltration depth versus time under for the feathery micro-channels under various TBC temeprature gradients 0using the 3D CFD model.}
+    \label{fig:tempGradCFD}
 \end{figure}
 
-\begin{figure}[!htb]
-\centering
-\begin{subfigure}{0.4\textwidth}
-\includegraphics[scale=0.2]{Figures/TemperatureView_image_00270.png} 
-\caption{Temperature at Final Time Step}
-\label{fig:Temper}
-\end{subfigure}
-\begin{subfigure}{0.4\textwidth}
-\includegraphics[scale=0.2]{Figures/Viscosity_View_image_00270.png}
-\caption{Viscosity at Final Time Step}
-\label{fig:viscVary}
-\end{subfigure}
+Fig. \ref{fig:tempGradCFD} shows results for the same $\Delta T_{x}$ used in Fig. \ref{fig:tempGradFPNM}, but using the 3D CFD model. Here, the overlap of $\Delta T_{x} = 1 K/\mu m$ and $\Delta T_{x} = 10 K/\mu m$ does not occur. This is likely due to the slightly nonlinear variation of the temperature in the TBC and CMAS. The latent heat of fusion of the CMAS in this model means the CMAS is absorbing different amounts of energy depending on the temperature, so the viscosity of the CMAS at a specific depth in the TBC is not one-to-one between the CFD models and FPNM.  Fig. \ref{fig:tempGradCFD}, shows that infiltration is dependent on the temperature gradient in the TBC in both directions, unlike the results from FPNM in Fig. \ref{fig:tempGradFPNM}. 
 
-\caption{Viscosity Variation with Temperature in Domain}
-\label{fig:TempAndVisc}
-\end{figure}
 
 \chapter{CONCLUSIONS}
 \section{Shock-droplet Interactions}
@@ -1932,9 +2139,51 @@ Computational results from other work show a larger difference between the exper
 
 \section{CMAS/TBC Infiltration}
 \label{sec:cmas_conc}
-A simulation methodology to simulate CMAS infiltrating a 7YSZ EB-PVD TBC was formulated using the Eulerian VOF method. Results from this methodology show that the hypothesis that chemistry effects in infiltration are higher-order and can be ignored, is potentially true, due to agreement between experimental and simulated infiltration times. 
+A method to directly resolve CMAS infiltration in TBCs was formulated and carried out via CFD-based numerical simulations. 
+The study evaluated a 2D rectangular and feathery channel, and a 3D feathery channel using CFD methods. 
+The 2D CFD models failed to resolve spontaneous capillary flow, and had to be driven by a pressure gradient, resulting in infiltration that was partially driven by inertial loads and capillary action.
+As a result of this, the results from the 2D CFD are non-physical, but can still elucidate important information about the infiltration process.
+The 3D CFD model was able to resolve spontaneous capillary flow, as indicated by the spontaneous formation of a meniscus, and downward flow occurring without the presence of a pressure gradient.
 
-Another important result is that infiltration occurs on several different time scales, characterized by varying infiltration rates. When a CMAS particle first contacts the TBC column, it experiences a period of fast infiltration, likely dominated by the momentum of the particle. From that point onward, the particle experiences a capillary-driven infiltration that is much slower, both due to the capillary forces being very weak, and because the particle solidifies as it infiltrates, impeding the infiltration rate further.
+
+We then compared infiltration depth CFD predictions for the 2D CFD models using conventional analytical OPM and CPM results (seen in Fig.~\ref{fig:rect_v_feather}). 
+The CFD results from Fig. \ref{fig:rect_v_feather} showed that the feathery microstructure was better at resisting infiltration, and that the CMAS infiltrated to shallower depths prior to reaching an equilibrium. 
+Interestingly, the equilibrium character observed in CFD was not present in the analytical OPM and CPM models. This was the first indication that the 2D model was not sufficient for resolving capillary flow.
+It is proposed that the 3D CFD model accounts for this discrepancy by allowing better interface resolution with AMR. The 3D CFD model results, shown in Fig. \ref{fig:3D_results} show that the flow in the 3D CFD model does not reach a state of equilibirum, like the 2D CFD model.
+The images of the infiltration shown in Fig. \ref{fig:3D_timehistory} shows that a meniscus does spontaneously form, providing evidence that the flow in the 3D CFD model is driven by capillary forces.
+A drawback of the 3D CFD model is that it is computationally expensive. This was alleviated by running the simulation for less time, and fitting the infiltration depth versus time data to an exponential curve. This resulted in a curve where results were extrapolated at desired time points beyond the simulation time. The extrapolated curve allowed a direct comparison between experiments, analytical models, and the 3D CFD model.
+The 3D CFD model, when extrapolated to 120 s, predicted a depth that was between the prediction of OPM and CPM. This is important because the experimental measurement at 120 s was also between the predicted results from OPM and CPM. These results are highlighted in Table \ref{tab:resultsCompare}. This shows the 3D CFD model is more accurate in predicting cMAS infiltration than OPM and CPM. However, the computational expense demands a simpler model, such as FPNM.
+
+The model of viscosity, its link to thermal conditions and state, are also important to understand. The CFD indicated the presence of air pockets that may contribute to the overall degradation of TBC properties after CMAS attack \cite{Naraparaju2014,Naraparaju2017, Naraparaju2019}. 
+We propose that the degradation at least partially occurs because of the difference in thermal conductivity between the TBC, the CMAS, and the air, which can be 2-3 orders of magnitude depending on the operating conditions. 
+
+In this effort, we also developed a novel analytical model referred to as the ``Feathery Pipe-network Model'' (FPNM). The method is derived on first-principles of capillary flow, and implemented to estimate the infiltration depth as a function of time in a feathery coating.
+Comparing the result from FPNM to the OPM, CPM, and experimental results showed that FPNM more closely resembled the simulated results at early infiltration times.
+At later infiltration times, FPNM became bounded between the OPM and CPM. 
+The FPNM result also aligned better with the experimental result, having only a 23\% error on the upper bound, as opposed to a 40.8\% error for OPM. 
+Therefore, the usage of the FPNM and CPM leads to a path that can potentially enhanced infiltration depth predictions (more accurate than using OPM and CPM) useful for TBC design. 
+%Manufacturers and airlines can be more confident in the lifetime of the engine coatings with these enhanced prediction capabilities.
+
+FPNM was then used for several parametric studies. First, the intercolumnar gap, $B$ was varied and Fig. \ref{fig:columnGapStudy} shows that smaller $B$ leads to less infiltration. This trend was nonlinear, with smaller $B$ leading to exponentially slower infiltraiton. Next, the feather gap width, $b$, was varied, and Fig. \ref{fig:featherGapStudy} shows that smaller feather gaps leads to slower infiltration. However, this effect had diminishing returns beyond $b = 2 \mu m$. Lastly, the feathery angle, $\theta$ was varied and Fig. \ref{fig:angleStudy} shows that shallower feather angles lead to slower infiltration.
+
+
+In an attempt to bring expand the discussion into the larger world of microfluidics, the infiltration process was then characterized using 2D CFD and FPNM based on the Ohnesorge Number of the liquid. 
+The Ohnesorge Number was varied by varying the viscosity of CMAS, with all other terms fixed. 
+Results from Fig.~\ref{fig:rect_v_feather_oh} show that the 2D rectangular channel column was more effective at stopping infiltration of CMAS with low $Oh$, and the 2D feathery channel was more effective at stopping infiltration of CMAS with high $Oh$. 
+FPNM shows that larger $Oh$ tends to cause slower infiltration.
+
+Next, the effect of solidification was considered in the infiltration process via implementing a solidification model in the 2D CFD, where the flowability threshold was varied. 
+Results from these CFD cases produced inconsistent infiltration profiles. 
+No pattern was observed until $FT=0.75$. 
+For this value and beyond, the infiltration profile was identical.
+However, none of these results significantly changed the equilibrium depth from the CFD result without solidification.
+Hence, it is reasonable to account for flow-stoppage purely with viscosity.
+
+Lastly, the effect of the temperature gradient in the TBC was varied. The primary effect of this was that the viscosity would change slower in less intense temperature gradients, and faster in more intense temperature gradients. Hence, the effectiveness of the TBC in preventing heat transfer has a direct impact on its effectiveness in mitigating CMAS infiltration. So, the temperature gradient was varied in both the 3D CFD and FPNM. Fig. \ref{fig:tempGradFPNM} and \ref{fig:tempGradCFD} show that less intense temperature gradients lead to faster overall infiltration, and more intense temperature gradients leads to slower infiltration. This happens because viscosity becomes larger faster in the more intense temperature gradient. However, differences between the implementation of the temperature-dependent viscosity in FPNM versus the CFD model mean there are discrepancies in the two models when the same temperature gradients are imposed.
+
+Overall, this work introduces new methods of predicting CMAS infiltration in TBCs. the 3D CFD model leads to more accurate predictions, but is more computationally expensive, and FPNM is less accurate but much faster. FPNM was also used to parameterically evaluate the geometry of the TBC microstructure so that better microstructure design decisions can be made. 
+
+There is much future work to consider. A chemical reaction model could be implemented in the CFD to predict where sintering occurs once the phase change happens between the CMAS and TBC. One could also implement a solid stress model in the CFD, which would help predict the delamination process. FPNM could also be improved by accounting for solidification of the CMAS, so that temperature and viscosity aren't only directly correleated with infiltration depth.
 
 
 %\section{Bookmarks}
