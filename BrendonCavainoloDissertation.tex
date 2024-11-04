@@ -1579,7 +1579,7 @@ Here, the roll-up point location was tracked in degrees relative to the droplet 
 \end{figure}
 
 Another way to understand how droplet deformation can occur is to observe the boundary layer along the droplet's surface.
-Figure \ref{fig:boundary_layer_v_Mach} shows how the droplet's boundary layer changes with respect to $M_{shock}$, and \ref{fig:BL_diagram} shows where the velocity information was extracted for these boundary layers.
+Figure \ref{fig:boundary_layer_v_Mach} shows how the droplet's boundary layer changes with respect to $M_{shock}$ at different non-dimensional times ($t^{*} = \frac{t-t_{impact}}{D \times c_{H2O}}$). Figure \ref{fig:BL_diagram} shows where the velocity information was extracted for these boundary layers.
 The boundary layer is directly related to the shear stress the droplet is experiencing along the interface. 
 This is a result of Newton's Law of Viscosity, where $\tau_{w} = \mu \left[\frac{\partial u}{\partial y}\right]_{y=0}$. 
 From this, there are many ways to estimate skin friction and pressure drag given the boundary layer information. 
@@ -1587,21 +1587,19 @@ From this, there are many ways to estimate skin friction and pressure drag given
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{Figures/coplotted_BLs.png}
-    \caption{Droplet's velocity boundary layer for $M_{shock} = 1.0, 2.0,...,10.0$ taken at the location marked in Figure \ref{fig:BL_diagram}.}
+    \caption{Droplet's velocity boundary layer for $M_{shock} = 1.0, 2.0,...,10.0$ taken at the location marked in Figure \ref{fig:BL_diagram}. From left to right, top to bottom, $t^{*} = \frac{t-t_{impact}}{D \times c_{H2O}} = 1.0, 2.0, 3.0, 4.0$.}
     \label{fig:boundary_layer_v_Mach}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.25\textwidth]{Figures/BL_diagram.png}
-    \caption{Accumulation of shear stress and pressure on the droplet after the shock has passed over the droplet. The shear stress accumulates along the air-water interface whereas the pressure accumulates both on the interface and within the droplet.}
+    \caption{Diagram of the boundary layer surrounding the droplet, where the boundary layer height is governed by the post-shock velocity.}
     \label{fig:BL_diagram}
 \end{figure}
 
 Figure \ref{fig:boundary_layer_v_Mach} shows that the boundary layers all have a similar shape, and the height of the boundary can be approximated by the location of the maximum velocity in the boundary layer. The maximum velocity is of a similar magnitude as the post-shock velocity once the bow shock has formed around the droplet.
 Once the boundary layer height is calculated, boundary layer theory can be used to determine the skin friction drag coefficient, $C_{f} = \frac{\tau_{w}}{0.5 \rho U^{2}_{post-shock}}$.
-Figure \ref{fig:BL_heigh_v_mach} shows the velocity boundary layer height as a function of $M_{shock}$, the location of the maximum velocity is extracted from Figure \ref{fig:boundary_layer_v_Mach} and plotted here.
-This again shows that the post-shock velocity, and hence, $M_{shock}$, affects the boundary layer height.
 
 \begin{figure}
     \centering
@@ -1797,47 +1795,6 @@ As $M_{shock}$ increases, it is depositing energy in the droplet more quickly, t
 \label{fig:def_time_scale}
 \end{figure}
 
-
-
-
-\subsection{Effect of Equation of State}
-
-\subsubsection{Benchmarking the EOS against experiments}
-
-Three separate EOS for water were used to determine the most appropriate EOS for the shock-droplet interaction problem: the Tait Equation, IAPWS-IF97, and the second-order compressible equation of state described by Esplin \cite{Esplin2016}.
-These EOS are benchmarked against each other and the Sembian case \cite{Sembian} in Figure \ref{fig:sembian_benchmark}
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{Figures/sembian_benchmark.png}
-\caption{Comparison of the experimental data from Sembian \cite{Sembian} and from the CFD simulations using different EOS for water.}
-\label{fig:sembian_benchmark}
-\end{figure}
-
-\subsubsection{Effect on one-way coupled cavitation model}
-
-\subsubsection{Effect on droplet shape}
-
-The effect of water EOS on ellipticity and $t_{deform}$ was evaluated.
-Figure \ref{fig:EOS_ellipticity} shows how the EOS affects the droplet ellipticity v. time.
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{Figures/EOS_drop_shape.png}
-\caption{Comparison of the experimental data from Sembian \cite{Sembian} and from the CFD simulations using different EOS for water.}
-\label{fig:EOS_ellipticity}
-\end{figure}
-
-Figure \ref{fig:EOS_deform} shows how the EOS affects $t_{deform}$ as a function of $M_{shock}$.
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{Figures/EOS_drop_shape.png}
-\caption{Comparison of the experimental data from Sembian \cite{Sembian} and from the CFD simulations using different EOS for water.}
-\label{fig:EOS_deform}
-\end{figure}
-
-\subsubsection{Effect on secondary droplet distribution}
 
 
 
