@@ -1057,21 +1057,19 @@ The finite-volume representation of the virtual shock tube is captured by unstru
 % Properties of both the CMAS and the TBC can affect the infiltration. Some of these properties are widely documented, such as thermal conductivity of the TBC \cite{Han2023}. Table \ref{tab:CMAS and TBC properties} shows the properties for both the CMAS and the TBC used in these simulations. Blank entries are properties not required by the models selected (in this case, for the solid TBC region).
 
 
-% \begin{table}[htp!]
-% \caption{\label{tab:CMAS and TBC properties} Summary of thermal and physical properties of CMAS and TBC}
-% \centering
-% \begin{ruledtabular}
-% \begin{tabular}{lcccccc}
-% Property & CMAS& TBC\\\hline
-% Thermal Conductivity (W/m-K)& 1.15 \cite{Bakal2017} & tabular \cite{Han2023} \\
-% Specific Heat (J/kg-K)& 900 \cite{KAKUDA2015350} & tabular \cite{Han2023} \\
-% Density (kg/m$^3$)& 2690 \cite{BANSAL20153901}& 4800 \cite{KAKUDA20092583}\\
-% Dynamic Viscosity (Pa-s)& Polynomial \cite{Naraparaju2019}& -\\
-% Latent Heat of Fusion (J/kg)& $1.973x10^7$ \cite{Costa2019}& -\\
-% Surface Tension (N/m)& 0.4 \cite{Bravo2020}& -\\
-% \end{tabular}
-% \end{ruledtabular}
-% \end{table}
+\begin{table}
+\caption{\label{tab:CMAS and TBC properties} Summary of thermal and physical properties of CMAS and TBC}
+\centering
+\begin{tabular}{lcccccc}
+Property & CMAS& TBC\\\hline
+Thermal Conductivity (W/m-K)& 1.15 \cite{Bakal2017} & tabular \cite{Han2023} \\
+Specific Heat (J/kg-K)& 900 \cite{KAKUDA2015350} & tabular \cite{Han2023} \\
+Density (kg/m$^3$)& 2690 \cite{BANSAL20153901}& 4800 \cite{KAKUDA20092583}\\
+Dynamic Viscosity (Pa-s)& Polynomial \cite{Naraparaju2019}& -\\
+Latent Heat of Fusion (J/kg)& $1.973x10^7$ \cite{Costa2019}& -\\
+Surface Tension (N/m)& 0.4 \cite{Bravo2020}& -\\
+\end{tabular}
+\end{table}
 
 % One important departure from previous work, however, is the use of the melting-solidification flow stop model to achieve a more accurate infiltration time. Here, a linear solidification curve is defined between the liquidus and solidus temperatures (1503 K and 1523 K respectively). The solid fraction of a particular cell is calculated as described in Section \ref{sec:solidmodel}.
 
@@ -1443,9 +1441,38 @@ Here, the values of the external pressure ($\Delta P$), inertial resistance ($\a
 
 % Initial conditions from simulations are used to construct a solution to this equation. This solution is compared to simulated, analytical, and experimental results.
 
+\subsection{Previous Theoretical Models: Open-pipe and Concentric-pipe models}
+\label{sec:RaviPipeModels}
+A summary of the open-pipe and concentric-pipe models is presented here. For a more in-depth description, please see ``Estimation
+of CMAS Infiltration Depth in EB-PVD TBCs: A New Constraint Model Supported with Experimental Approach''
+
+\begin{equation}
+    t=\frac{\mu r\ h^2}{2\sigma k cos\theta}
+    \label{eq:PM_base}
+\end{equation}
+
+\noindent here, t is the infiltration time, r is the radius open for infiltration, h is the infiltration depth, $\mu$,$ \sigma$, $\theta$ are viscosity, surface tension, and contact angle respectively \cite{Naraparaju2017,ZHAO201474}. The parameter k represents the porosity and varies depending on whether the open-pipe or concentric-pipe model is being used. Some difficulties arise here, as some of the properties in the above equation vary nonlinearly with temperature, so initial values will be used for the calculations. The open-pipe model defines k as the following
+
+\begin{equation}
+    %k_o=\frac{r^2\phi^2}{8\tau\left(1-\phi\right)^2}
+    k=\frac{r^2\phi^2}{8\tau\left(1-\phi\right)^2}
+    \label{eq:oPM}
+\end{equation}
+
+\noindent here $\phi$ is the overall pore fraction, and $\tau$ is a geometric factor based on a ratio of area of the column to area of the feather arms, and it was found to be 2.31 for feathery microstructures \cite{Naraparaju2019}.The concentric-pipe model is similar, but defines k as
+
+\begin{equation}
+    %k_o=\frac{\phi}{8\tau^2}b^2\left[1+\frac{a^2}{b^2}+\left(1-\frac{a^2}{b^2}\right)\frac{1}{ln\left(a/b\right)}\right]
+    k=\frac{\phi}{8\tau^2}b^2\left[1+\frac{a^2}{b^2}+\left(1-\frac{a^2}{b^2}\right)\frac{1}{ln\left(a/b\right)}\right]
+    \label{eq:CPM}
+\end{equation}
+
+\noindent where a and b are the outer radii of the concentric pipes \cite{Naraparaju2019}. 
+
+
 \subsection{Theoretical Model: FPNM}
 \label{sec:pipeNetworkMethod}
-This works also seeks a more representative, but still intuitive way of describing the flow within the feathery microstructure of a TBC. Therefore, a feathery-pipe-network model (FPNM)  is formulated and proposed and is based on considering a network of capillary channels. This model was inspired by a capillary flow electrical circuit analogy \cite{Mikaelian2020}. However, the circuit analogy does not allow for configurations matching the TBC gap. So, FPNM is proposed. Theoretical model development has also shown that the Lucas-Washburn equation can indeed be extended into larger, heterogeneous porous media \cite{Cai2021, WAGHMARE2010561}, but this theoretical model is also more generalized and is difficult to specifically model the configurations seen in Figures \ref{fig:TBC_scans} and \ref{fig:dimensions}.
+This works also seeks a more representative, but still intuitive way of describing the flow within the feathery microstructure of a TBC. Therefore, a feathery-pipe-network model (FPNM)  is formulated and proposed and is based on considering a network of capillary channels. This model was inspired by a capillary flow electrical circuit analogy \cite{Mikaelian2020}. However, the circuit analogy does not allow for configurations matching the TBC gap. So, FPNM is proposed. Theoretical model development has also shown that the Lucas-Washburn equation can indeed be extended into larger, heterogeneous porous media \cite{Cai2021, WAGHMARE2010561}, but this theoretical model is also more generalized and is difficult to specifically model the configurations seen in Figure \ref{fig:dimensions}.
 In FPNM, there is a primary channel, with other secondary channels extending (almost) perpendicular from the primary tube. In the context of the FPNM, these secondary channels, effectively retard the primary-channel flow. The FPNM model formulation demands added input using the following variables (which can be referenced in Fig. \ref{fig:FPNM_cartoon}:
 
 \begin{itemize}
@@ -1699,16 +1726,15 @@ This supports the idea that the region of the droplet closest to the trailing ed
     \end{figure}
 \end{landscape}
 
-\subsection{Secondary Droplets}
+\subsection{Deformation Dynamics}
 \label{subsec:secondaryDropResults}
-The passive scalar described in Equation \ref{eq:secondDropPassiveScalar} was set up in the simulation domain, and ran. Figure \ref{fig:secondaryDropResult} shows the evolution of the passive scalar after the shock passes through the droplet. There are two issues here; the passive scalar's value at the front of the droplet is higher than intended due to compression of the droplet, and, the simulation results diverge before secondary droplets form. So the second part of this method (that is, tracking the relative position of the secondary droplets to the primary droplets), cannot yet be evaluated. Relaxing the second-order terms in the algorithms and solving on a finer mesh will likely solve these problems, but it is imperative to figure out the rest of the methods on the coarse mesh first. 
-
-Besides these issues however, the passive scalar behaves as expected, where a minimum value appears at the surface of the droplet, which can be extracted as a threshold to track the secondary droplets.
+The passive scalar described in Equation \ref{eq:secondDropPassiveScalar} and \ref{eq:diffusionSource} was set up in the simulation domain, and ran. Figure \ref{fig:secondaryDropResult} shows the evolution of the position-tracking passive scalar after the droplet begins to experience breakup. 
+In Figure \ref{fig:secondaryDropResult} shows that the leading edge of the droplet tends to roll up to the top of the droplet, and hence, the leading edge is the first part of the droplet to atomize via sheet-stripping. The top of the droplet moves downward toward the trailing edge
 
 \begin{figure}[htp!]
 \centering
 \includegraphics[width=.5\textwidth]{Figures/secondaryDropPassiveScalar.png}
-\caption{Diffusive passive scalar used to track secondary droplets after the shock has passed through the droplet.}
+\caption{Position-tracking passive scalar used to track droplet deformation dynamics after the shock has passed through the droplet.}
 \label{fig:secondaryDropResult}
 \end{figure}
 
@@ -1807,7 +1833,7 @@ Here, the results from the simulations and analytical models are discussed, star
 Since CMAS infiltration in a TBC is a capillary-dominated flow, the methodology above must be validated for use with such flows.
 A canonical configuration for a capillary-driven flow is the transient capillary rise in a circular tube.
 This case is typically used when validating multiphase numerical methods \cite{GRUNDING2020142, Shiri2022}. 
-To do this, a 3D cylindrical tube was set up using the same methods described in Section \ref{sec:methods}.
+To do this, a 3D cylindrical tube was set up using the same methods described in Section \ref{sec:CMAS_methods}.
 Constant viscosity water with no solidification model was used in place of the molten CMAS, and the domain was isothermal.
 The tube's dimensions and boundary conditions are shown in Fig.\ref{fig:benchmark_diagram}. Zero pressure gradient boundaries were used to ensure only capillary forces are driving the flow. Only water was allowed to enter the tube, while water and air can exit the tube.
 
@@ -1882,10 +1908,10 @@ A mesh sensitivity study was conducted where a single CMAS droplet was resolved.
 \end{table}
 
 \subsubsection{2D CFD Model}
-In Section \ref{sec:methods}, it is mentioned that the boundary conditions on the 2D model make it such that it is not strictly a capillary-driven flow, but also inertially-driven. This has unintneded consequences on the results. The limitations in the 2D model causes the flow to reach a state of equilibrium, as seen in Fig. \ref{fig:rect_v_feather}. This phenomenon is non-physical, since the CMAS should continue to infiltrate instead of reach a point of equilibrium \cite{Naraparaju2017}. So, the 2D geometry cannot be used to ``resolve'' the infiltration process. However, it is still valuable in the sense that it can demonstrate a microstructure's ability to stop the infiltration under different circumstances.
+In Section \ref{sec:CMAS_methods}, it is mentioned that the boundary conditions on the 2D model make it such that it is not strictly a capillary-driven flow, but also inertially-driven. This has unintneded consequences on the results. The limitations in the 2D model causes the flow to reach a state of equilibrium, as seen in Fig. \ref{fig:rect_v_feather}. This phenomenon is non-physical, since the CMAS should continue to infiltrate instead of reach a point of equilibrium \cite{Naraparaju2017}. So, the 2D geometry cannot be used to ``resolve'' the infiltration process. However, it is still valuable in the sense that it can demonstrate a microstructure's ability to stop the infiltration under different circumstances.
 
 To understand the effect of geometry, the 2D CFD results from the rectangular and feathery channel geometries are shown in Fig. \ref{fig:dimensions}.
-Additionally, the 2D CFD results are compared to analytical solutions of the open-pipe and concentric-pipe models (OPM, and CPM respectively) \cite{Naraparaju2019} based on models detailed in Appendix \ref{sec:app:RaviPipeModels}. 
+Additionally, the 2D CFD results are compared to analytical solutions of the open-pipe and concentric-pipe models (OPM, and CPM respectively) \cite{Naraparaju2019} based on models detailed in Appendix \ref{sec:RaviPipeModels}. 
 Fig.~\ref{fig:rect_v_feather} shows the infiltration depth versus time for the rectangular and feathery simulations, co-plotted with the analytical OPM and CPM solutions. 
 Note that the CFD results in Fig.~\ref{fig:rect_v_feather} account for a fluidic viscosity that varies with temperature which is based on polynomial fit to experimentally-measured data \cite{Naraparaju2017}.\\
 
@@ -2163,6 +2189,18 @@ Fig. \ref{fig:tempGradCFD} shows results for the same $\Delta T_{x}$ used in Fig
 \chapter{CONCLUSIONS}
 \section{Shock-droplet Interactions}
 \label{sec:shockdrop_conc}
+
+In this work, we were interested in finding new ways to characterize various aspects of the shock-droplet interaction problem. A virtual shock tube was constructed (Figure \ref{fig:domain}) and multiphase VOF CFD was used to simulate various stages of shock-droplet interactions, including initial shock propagation into the droplet, reflection of the shock within the droplet, and post-shock breakup. Several methods were proposed to help evaluate this phenomena. 
+
+Firstly, passive scalars were proposed as a method of tracking the accumulation of stresses inside the droplet. Specifically, the shear stresses and normal stresses were tracked in the droplet (Figure \ref{fig:shear_pressure_accumulation}). An interesting result from this shows that a a sign-change in shear stress at the air-water interface causes a Kelvin-Helmholtz instability, as seen in Figure \ref{fig:roll_up_points}. Allowing the scalar to convect in this case also shows that the K-H point also instigates the droplet roll-up. Figure \ref{fig:roll_up_points_data} shows that this phenomenon is independent of $M_{shock}$.
+
+A position-mapping passive scalar provided insight on the droplet's deformation dynamics just before breakup. Figure \ref{fig:secondaryDropResult} shows that the leading edge rolls up to the top of the droplet. Hence, the leading edge is the first part of the droplet to be atomized during sheet-stripping breakup. The top of the droplet also rolls down to the trailing edge of the droplet. 
+
+Another passive scalar was used to extract the period and magnitude of underpressure within the droplet, shown in Figure \ref{fig:underpressure_cav_time}. This information was then used in a proposed one-way coupled, analytical cavitation model as a way to determine where cavitation may occur in the droplet without having to include a cavitation model in the simulation. Results from this study are in Figure \ref{fig:cav_time_and_underpressure_centerline} show that the majority of potential cavitation occurs toward the trailing edge of the droplet, where the rarefaction waves focus into a point. However, there is also a region near the leading edge of the droplet where cavitation may also occur, albeit at a lower strength, leading to less bubble growth. This effect was not exacerbated by increasing $M_{shock}$, potentially because the droplet can only absorb so much energy from the shock, so there is a similar amount of energy available for cavitation, regardless of $M_{shock}$.
+
+The time history of pressure at certain points along the droplet's axis (see Figure \ref{fig:point_probes}) was extracted in Figure \ref{fig:pressure_mach_sweep}. These plots show that the large spikes of underpressure tend to happen in the back of the droplet first, and then both in the front and back afterward as the acoustic and rarefaction waves reflect and bounce around within the droplet. Increasing $M_{shock}$ increases the magnitude of these spikes.
+
+Next, a method to track droplet shape is proposed where the simulated droplet's moments of inertia are calculated, then $I_{xx}$ and $I_{yy}$ were set to that of an equivalent ellipse. The major and minor diameters are calculated for that equivalent ellipse, and ellipticity is calculated as well. Results show that the droplet deformation time scale $t_{deform}$ (the time when ellipticity becomes non-zero) changes significantly at lower $M_{shock}$, but as $M_{shock}$ increases, $t_{deform}$ does not change all that much. This is likely, again, due to the droplet being able to only absorb so much energy from the initial shock, causing an upper limit in deformation. The ramifications for this show that vehicles in high-Mach regimes will likely experience less vehicle loading from atmospheric droplets. Thus, hypersonic vehicles should be designed to achieve Mach numbers that will cause atmospheric droplets to breakup earlier to ease vehicle loads. 
 
 \section{CMAS/TBC Infiltration}
 \label{sec:cmas_conc}
