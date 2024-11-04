@@ -14,6 +14,7 @@
 \usepackage{rotating}
 \usepackage{tabularx}
 \usepackage{pdflscape}
+\usepackage[nottoc]{tocbibind}
 \usepackage[square,numbers]{natbib}
 %\bibliographystyle{new-aiaa}
 \bibliographystyle{abbrvnat}
@@ -93,13 +94,13 @@ The Volume-of-Fluid method, an Eulerian multiphase flow model that adds a volume
 
 \newpage
 
-\chapter{LIST OF ABBREVIATIONS}
-\begin{acronym}
-    \acro{CMAS}{Calcium-Magnesium-Alumino-Silicate}
-    \acro{CFD}{Computational Fluid Dynamics}
-    \acro{CFL}{Courant-Friedrichs-Lewy}
-    \acro{EOS}{Equation-of-state}
-\end{acronym}
+% \chapter{LIST OF ABBREVIATIONS}
+% \begin{acronym}
+%     \acro{CMAS}{Calcium-Magnesium-Alumino-Silicate}
+%     \acro{CFD}{Computational Fluid Dynamics}
+%     \acro{CFL}{Courant-Friedrichs-Lewy}
+%     \acro{EOS}{Equation-of-state}
+% \end{acronym}
 
 
 \mainmatter
@@ -171,7 +172,7 @@ Time discretization techniques are often one of two categories: explicit, or imp
 
 Another important consideration in CFD simulations is whether to use a segregated or coupled method to solve the governing equations. The main difference between the two methods is that the coupled method combines all of the governing equations into one large linear system of equations, and solves all of the flow variables simultaneously, and employs density-based schemes. On the other hand, segregated solvers are pressure-based and solve flow variables iteratively using several different systems of equations \cite{ransom_1996}.
 
-Stability in a CFD simulation is generally characterized by Von-Neumann Stability Analysis, which essentially says that the round-off error, $\epsilon$, must take the form $|\epsilon^{n+1} / \epsilon^{n}| \leq 1$, where n is the timestep.  Round-off error is represented by an arbitrary function, and that arbitrary function is approximated using a Fourier Series expansion. The result of this analysis leads to a dimensionless number, called the Courant number, shown in Equation \ref{eq:courantNo}, which is a function of the velocity, mesh size, and timestep. The criterion for stability is called the \ac{CFL} criterion, and generally means that the Courant number must be close to unity for a solution to be stable. It is important to note that this the \ac{CFL} criteria is generally necessary, but not always sufficient for a stable solution. As solvers get more complex, there are more stability criteria to consider \cite{Anderson1995}.
+Stability in a CFD simulation is generally characterized by Von-Neumann Stability Analysis, which essentially says that the round-off error, $\epsilon$, must take the form $|\epsilon^{n+1} / \epsilon^{n}| \leq 1$, where n is the timestep.  Round-off error is represented by an arbitrary function, and that arbitrary function is approximated using a Fourier Series expansion. The result of this analysis leads to a dimensionless number, called the Courant number, shown in Equation \ref{eq:courantNo}, which is a function of the velocity, mesh size, and timestep. The criterion for stability is called the CFL criterion, and generally means that the Courant number must be close to unity for a solution to be stable. It is important to note that this the CFL criteria is generally necessary, but not always sufficient for a stable solution. As solvers get more complex, there are more stability criteria to consider \cite{Anderson1995}.
 
 \begin{equation}
     Co=u\frac{\Delta t}{\Delta x}\ \approx 1
@@ -1825,6 +1826,7 @@ As $M_{shock}$ increases, it is depositing energy in the droplet more quickly, t
 
 
 \section{CMAS/TBC Infiltration}
+\label{sec:CMAS_results}
 Here, the results from the simulations and analytical models are discussed, starting with a mesh sensitivity study, moving on to comparing the analytical models with the numerical results, and finally characterization based on several properties is considered.
 
 \subsection{CFD Model}
@@ -2261,7 +2263,9 @@ There is much future work to consider. A chemical reaction model could be implem
 \chapter{COPYRIGHT PERMISSIONS}
 This dissertation was adapted from many published works, each with different copyright protections. For work published at AIAA Aviation \cite{CavainoloAviation24, Cavainolo2023,Cavainolo2022}, copyright ownership was retained by the author, so no permission is needed. 
 
-All other work included in this work is currently pending copyright permission from other publication sources.
+Sections related to CMAS/TBC interactions were adapted from a manuscript accepted for publication in Physics of Fluids \cite{CavainoloPoF}. Copyright permission is granted from AIP Publishing to use the version-of-record in the author's thesis or dissertation.
+
+All other work included in this work is currently unpublished.
 % You must include a \newpage command after each appendix.  And each appendix can be inserted as a chapter after the \appendix command.  
 
 % This template is set to auto-letter multiple appendices.  
@@ -2282,5 +2286,4 @@ All other work included in this work is currently pending copyright permission f
 Supplementary documentation.
 
 
-%\begin{thebibliography}{99}
 
