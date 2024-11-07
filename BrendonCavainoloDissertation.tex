@@ -79,12 +79,16 @@
 The Volume-of-Fluid method, an Eulerian multiphase flow model that adds a volume fraction transport equation to the CFD governing equations, is widely used for any fluid-fluid interface tracking problem. There are important aspects of multiphase flow that impact aircraft flight, especially flight in extreme environments. These extreme environments can range from wet, icy conditions to sandstorms, and volcanic debris. The problems posed by these harsh environments are only exacerbated by aircraft that tend to travel at higher Mach-numbers. The specific aims of the proposed research include application of the Volume-of-fluid method to the following aspects of aircraft flight: shock-droplet interactions, and molten CMAS infiltrating a thermal barrier coating. Passive scalars are used in novel ways to elucidate droplet breakup physics. From this, a mechanism for how instabilities form on the air-droplet interface is discovered. It is also found that non-cavitating droplet breakup becomes much less dependent on Mach number at higher Mach numbers. A cavitation model designed for underwater explosions is adapted to the shock-droplet problem, and results show that cavitation phenomena is greatly dependent on Mach number, but the adapted model overpredicts cavitation effects. 2D and 3D CFD models are developed for the CMAS infiltration problem, and those are compared to analytical models from literature, and a new proposed analytical model called the feathery pipe network model. Results show that feathery pipe network model is both computationally inexpensive, and allows parameterization of useful properties.% abstract files can be added here.  I recommend using \input over \include
 \end{abstract}
 
-%\dedication{Should you choose to include a dedication, it should be centered vertically on the page. If you choose, you may center it horizontally as well, provided that it is no longer than a paragraph. There should be no heading on the dedication page. This is the only major section with no heading.}
+\dedication{Dedicated to my wonderful wife, Alyssa Mickle. She is my partner, my best friend, and the love of my life.}
 % creates vertically and horizontally centered dedication page.  If larger than a paragraph, remove the \vspace*fil commands from the dedication section in the class file.
 
 \begin{acknowledgments}
     This material is based upon work supported by National Science Foundation grant OISE 1952523.
     This material is based upon work supported by the National Science Foundation Graduate Research Fellowship under Grant No. GR104853.
+    I would like to acknowledge my advisor, Dr. Michael Kinzel, for his mentorship and guidance in the development of this dissertation.
+    I would also like to acknowledge my labmates, Alexander Spitzer, Caroline Anderson, Khanh Nguyen, Reed Forehand, Janice Zou, Taylor Peterson, Sweety Sarkar, Rajendra Shrestha, Jackson Asiatico, Zachary Miles, Juan Roldan, Andres Torres-Figeuroa, and Sebastian Lopez. Their assistance and encouragement helped make this dissertation possible. 
+    I would like to thank Dr. Seetha Raghavan and Dr. Ing. Ravisankar Naraparaju at DLR for their work in guiding and mentoring me during my international research experience.
+    Lastly, I would like to thank everyone who has advised me during my internships, Dr. Rose McCallen (LLNL), Dr. Robert Nourgaliev (LLNL), Dr. Patrick Greene (LLNL), Dr. Jean-Pierre Delplanque (UC Davis), Dr. Rebecca Barney (NREL), and Kevin Yugulis (Battelle).
 \end{acknowledgments}
 
 \tableofcontents
@@ -2259,9 +2263,14 @@ There is much future work to consider. A chemical reaction model could be implem
 %However, bookmarks should include all major and chapter headings and at least first-level subheadings EXACTLY as they appear in the document (and the TOC). And readers should be able to link to pages within the ETD from all of the bookmarks, the TOC entries, as well as the Lists of Figures and Tables.
 % all bookmarks are created through hyperref, so be sure that any additional packages are compatible.
 
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
 \appendix
 
-\newpage
+
 
 \chapter{COPYRIGHT PERMISSIONS}
 This dissertation was adapted from many published works, each with different copyright protections. For work published at AIAA Aviation \cite{CavainoloAviation24, Cavainolo2023,Cavainolo2022}, copyright ownership was retained by the author, so no permission is needed. 
@@ -2270,6 +2279,10 @@ Sections related to CMAS/TBC interactions were adapted from a manuscript accepte
 
 All other work included in this work is currently unpublished.
 
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
 \newpage
 % You must include a \newpage command after each appendix.  And each appendix can be inserted as a chapter after the \appendix command.  
 
